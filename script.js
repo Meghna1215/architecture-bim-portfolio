@@ -4,47 +4,83 @@ window.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("loaded");
 
   const header = document.querySelector(".site-header");
-  const chapters = [...document.querySelectorAll(".capability")];
+  const reel = document.querySelector(".capability-reel");
+  const items = reel ? [...reel.querySelectorAll(".capability")] : [];
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let ticking = false;
+  let activeIndex = -1;
 
   const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 
-  const updateScrollScene = () => {
-    const viewportHeight = window.innerHeight;
-    const mobile = window.matchMedia("(max-width: 680px)").matches;
+  const scrollToItem = (index) => {
+    if (!reel || items.length < 2) return;
+    const reelTop = window.scrollY + reel.getBoundingClientRect().top;
+    const travel = Math.max(1, reel.offsetHeight - window.innerHeight);
+    const destination = reelTop + (index / (items.length - 1)) * travel;
+    window.scrollTo({ top: destination, behavior: reducedMotion.matches ? "auto" : "smooth" });
+  };
 
+  items.forEach((item, index) => {
+    const trigger = item.querySelector(".chapter-heading");
+    const panel = item.querySelector(".chapter-body");
+    if (!trigger || !panel) return;
+
+    const triggerId = `capability-trigger-${index + 1}`;
+    const panelId = `capability-panel-${index + 1}`;
+    trigger.id = triggerId;
+    trigger.setAttribute("role", "button");
+    trigger.setAttribute("tabindex", "0");
+    trigger.setAttribute("aria-controls", panelId);
+    panel.id = panelId;
+    panel.setAttribute("role", "region");
+    panel.setAttribute("aria-labelledby", triggerId);
+
+    trigger.addEventListener("click", () => scrollToItem(index));
+    trigger.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        scrollToItem(index);
+      }
+    });
+  });
+
+  const updateReel = () => {
+    const viewportHeight = window.innerHeight;
     header?.classList.toggle("is-scrolled", window.scrollY > 28);
 
-    chapters.forEach((chapter, index) => {
-      const rect = chapter.getBoundingClientRect();
-      const enter = mobile || reducedMotion.matches
-        ? 1
-        : clamp(1 - rect.top / (viewportHeight * 0.88));
+    if (reel && items.length) {
+      const rect = reel.getBoundingClientRect();
       const travel = Math.max(1, rect.height - viewportHeight);
-      const progress = mobile || reducedMotion.matches
-        ? 0
-        : clamp(-rect.top / travel);
-      const scale = 1 - progress * 0.032;
+      const progress = clamp(-rect.top / travel);
+      const position = progress * (items.length - 1);
+      const nextActiveIndex = Math.round(position);
 
-      chapter.style.setProperty("--chapter-enter", enter.toFixed(3));
-      chapter.style.setProperty("--chapter-progress", progress.toFixed(3));
-      chapter.style.setProperty("--chapter-scale", scale.toFixed(4));
-      chapter.style.zIndex = String(index + 2);
-      chapter.classList.toggle("is-visible", enter > 0.42 && rect.bottom > 0);
-    });
+      items.forEach((item, index) => {
+        const continuousOpen = clamp(1 - Math.abs(position - index));
+        const open = reducedMotion.matches ? Number(index === nextActiveIndex) : continuousOpen;
+        const selected = index === nextActiveIndex;
+        const trigger = item.querySelector(".chapter-heading");
+        const panel = item.querySelector(".chapter-body");
+
+        item.style.setProperty("--open", open.toFixed(3));
+        item.classList.toggle("is-active", selected);
+        trigger?.setAttribute("aria-expanded", String(selected));
+        panel?.setAttribute("aria-hidden", String(!selected));
+      });
+
+      if (nextActiveIndex !== activeIndex) activeIndex = nextActiveIndex;
+    }
 
     ticking = false;
   };
 
   const requestUpdate = () => {
-    if (!ticking) {
-      ticking = true;
-      requestAnimationFrame(updateScrollScene);
-    }
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(updateReel);
   };
 
-  updateScrollScene();
+  updateReel();
   window.addEventListener("scroll", requestUpdate, { passive: true });
   window.addEventListener("resize", requestUpdate);
   reducedMotion.addEventListener?.("change", requestUpdate);
