@@ -590,18 +590,26 @@ footer { padding: 1.5rem var(--pad); display: flex; justify-content: space-betwe
   color: var(--bone);
 }
 .capability-reel-sticky {
+  --reel-header-height: 4.25rem;
+  --reel-top-space: clamp(2rem, 5vh, 4.25rem);
+  --reel-bottom-space: .75rem;
+  --reel-label-height: clamp(2.65rem, 5vh, 3.25rem);
+  --reel-row-height: clamp(3rem, 6.1vh, 3.75rem);
   position: sticky;
-  top: 0;
-  height: 100svh;
-  min-height: 42rem;
+  top: var(--reel-header-height);
+  height: calc(100svh - var(--reel-header-height));
+  min-height: 0;
   overflow: hidden;
-  padding: 5rem var(--pad) 1.25rem;
+  padding: var(--reel-top-space) var(--pad) var(--reel-bottom-space);
+  display: flex;
+  flex-direction: column;
   background:
     radial-gradient(circle at 82% 20%, rgba(75,30,35,.17), transparent 30rem),
     linear-gradient(135deg, #171d24, #12171d 68%, #19191b);
 }
 .reel-topline {
-  height: 3.5rem;
+  flex: 0 0 var(--reel-label-height);
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -612,8 +620,9 @@ footer { padding: 1.5rem var(--pad); display: flex; justify-content: space-betwe
   color: rgba(230,224,214,.64);
 }
 .capability-list {
-  height: calc(100svh - 9.75rem);
-  min-height: 32rem;
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -621,8 +630,8 @@ footer { padding: 1.5rem var(--pad); display: flex; justify-content: space-betwe
 }
 .capability-reel .capability {
   --open: 0;
-  flex: var(--open) 1 calc(3.9rem + var(--open) * .15rem);
-  min-height: 3.9rem;
+  flex: var(--open) 1 var(--reel-row-height);
+  min-height: var(--reel-row-height);
   height: auto;
   position: relative;
   margin: 0;
@@ -639,7 +648,7 @@ footer { padding: 1.5rem var(--pad); display: flex; justify-content: space-betwe
   left: 0;
   top: 0;
   width: 2px;
-  height: 3.9rem;
+  height: var(--reel-row-height);
   background: var(--blue);
   opacity: calc(.2 + var(--open) * .8);
 }
@@ -650,7 +659,7 @@ footer { padding: 1.5rem var(--pad); display: flex; justify-content: space-betwe
 .capability-reel .chapter-sticky {
   position: relative;
   top: auto;
-  min-height: 100%;
+  min-height: 0;
   height: 100%;
   padding: 0;
   overflow: hidden;
@@ -665,8 +674,8 @@ footer { padding: 1.5rem var(--pad); display: flex; justify-content: space-betwe
 .capability-reel .chapter-sticky::after,
 .capability-reel .chapter-topline { display: none; }
 .capability-reel .chapter-heading {
-  flex: 0 0 3.9rem;
-  min-height: 3.9rem;
+  flex: 0 0 var(--reel-row-height);
+  min-height: var(--reel-row-height);
   display: grid;
   grid-template-columns: 3rem minmax(8rem,1fr) minmax(11rem,.42fr);
   gap: 1rem;
@@ -760,9 +769,12 @@ footer { padding: 1.5rem var(--pad); display: flex; justify-content: space-betwe
 
 @media(max-width:820px) {
   .capability-reel { height: calc(100svh + 400vh); }
-  .capability-reel-sticky { min-height: 39rem; padding-top: 4.25rem; }
-  .reel-topline { height: 3rem; }
-  .capability-list { height: calc(100svh - 8.5rem); min-height: 30rem; }
+  .capability-reel-sticky {
+    --reel-top-space: clamp(1.1rem, 3vh, 2rem);
+    --reel-label-height: clamp(2.4rem, 5vh, 3rem);
+    --reel-row-height: clamp(2.9rem, 6.3vh, 3.4rem);
+    min-height: 0;
+  }
   .capability-reel .chapter-body { grid-template-columns: minmax(11rem,.7fr) minmax(0,1.3fr); padding-left: .6rem; gap: 1.25rem; }
   .capability-reel .chapter-copy > p:not(.lead) { display: none; }
   .capability-reel .chapter-copy .lead { font-size: 1.35rem; }
@@ -775,23 +787,25 @@ footer { padding: 1.5rem var(--pad); display: flex; justify-content: space-betwe
     margin-top: 0;
   }
   .capability-reel-sticky {
-    height: 100svh;
-    min-height: 34rem;
-    padding: 4.25rem var(--pad) .7rem;
+    --reel-top-space: .6rem;
+    --reel-bottom-space: .55rem;
+    --reel-label-height: 2.25rem;
+    --reel-row-height: clamp(2.7rem, 6.5svh, 3.15rem);
+    height: calc(100svh - var(--reel-header-height));
+    min-height: 0;
+    padding: var(--reel-top-space) var(--pad) var(--reel-bottom-space);
   }
-  .reel-topline { height: 2.65rem; }
   .reel-topline span:last-child { display: none; }
-  .capability-list { height: calc(100svh - 7.6rem); min-height: 28rem; }
   .capability-reel .capability {
-    flex-basis: calc(3.25rem + var(--open) * .1rem);
-    min-height: 3.25rem;
+    flex-basis: var(--reel-row-height);
+    min-height: var(--reel-row-height);
     padding-top: 0;
   }
-  .capability-reel .capability::before { height: 3.25rem; }
+  .capability-reel .capability::before { height: var(--reel-row-height); }
   .capability-reel .chapter-sticky { min-height: 100%; padding: 0; border-radius: 0; }
   .capability-reel .chapter-heading {
-    flex-basis: 3.25rem;
-    min-height: 3.25rem;
+    flex-basis: var(--reel-row-height);
+    min-height: var(--reel-row-height);
     grid-template-columns: 2rem 1fr;
     gap: .45rem;
     padding: .45rem .4rem;
@@ -830,6 +844,17 @@ footer { padding: 1.5rem var(--pad); display: flex; justify-content: space-betwe
   .capability-reel .automation-card { height: 100%; min-height: 0; padding: .55rem; }
   .capability-reel .automation-card strong { font-size: .58rem; }
   .capability-reel .automation-card i { width: 42%; }
+}
+
+@media (max-height: 760px) and (min-width: 681px) {
+  .capability-reel-sticky {
+    --reel-top-space: 1rem;
+    --reel-label-height: 2.35rem;
+    --reel-row-height: clamp(2.65rem, 6.4vh, 3rem);
+  }
+  .capability-reel .chapter-body { padding-top: .55rem; padding-bottom: .75rem; }
+  .capability-reel .chapter-copy > p:not(.lead),
+  .capability-reel .tags { display: none; }
 }
 
 @media(prefers-reduced-motion:reduce) {
